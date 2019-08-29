@@ -25,6 +25,7 @@ const db = new sequelize({
 
 const accounts = db.define('accounts', { // model : table in database
     email: sequelize.STRING,
+    password: sequelize.STRING,
     full_name: sequelize.STRING,
     roll: sequelize.STRING,
     phone_number: sequelize.STRING,
@@ -33,6 +34,7 @@ const accounts = db.define('accounts', { // model : table in database
 })
 // accounts.create({
 //     email: 'dovantuit@gmail.com',
+//     password:'123456',
 //     full_name: 'do van tu',
 //     roll: 'cong tac vien',
 //     phone_number: '0947213743',

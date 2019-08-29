@@ -3,6 +3,23 @@ var express = require("express");
 var app = express();
 const bodyParser = require('body-parser');
 const { accounts, students } = require('./db.js')
+const { transporter, options } = require('./main')
+transporter.verify(function (error, success) {
+    // Nếu có lỗi.
+    if (error) {
+        console.log(error);
+    } else { //Nếu thành công.
+        console.log('Kết nối thành công!');
+
+        transporter.sendMail(options, (error, info) => {
+            if (error) {
+                console.log('error')
+            } else {
+                console.log('success')
+            }
+        });
+    }
+});
 // app.use(express.static("public"));
 // app.set("view engine", "ejs");
 // app.set("views","./views")
@@ -17,6 +34,14 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.get("/", (req, res) => res.send('xin chao'));
 // get list accounts
 app.get('/accounts_read', (req, res) => {
+
+    // gửi mail
+
+
+
+
+    //
+
     accounts.findAll()
         .then((accounts) => res.json({ 'kq': 1, 'accounts': accounts }))
         .catch(err => res.json({ 'kq': 0 }))
@@ -24,6 +49,7 @@ app.get('/accounts_read', (req, res) => {
 // add accounts
 app.post('/accounts_add', (req, res) => {
     let email = req.body.email
+    let password = req.body.password
     let full_name = req.body.full_name
     let roll = req.body.roll
     let phone_number = req.body.phone_number
@@ -31,6 +57,7 @@ app.post('/accounts_add', (req, res) => {
     // let is_active = req.body.is_active
     accounts.create({
         email: email,
+        password: password,
         full_name: full_name,
         roll: roll,
         phone_number: phone_number,
@@ -43,6 +70,7 @@ app.post('/accounts_add', (req, res) => {
 app.post('/accounts_update', (req, res) => {
     const { id,
         email,
+        password,
         full_name,
         roll,
         phone_number,
@@ -52,6 +80,7 @@ app.post('/accounts_update', (req, res) => {
     accounts.update({
         id: id,
         email: email,
+        password: password,
         full_name: full_name,
         roll: roll,
         phone_number: phone_number,
@@ -68,6 +97,7 @@ app.post('/accounts_update', (req, res) => {
 app.post('/accounts_update', (req, res) => {
     const { id,
         email,
+        password,
         full_name,
         roll,
         phone_number,
@@ -77,6 +107,7 @@ app.post('/accounts_update', (req, res) => {
     accounts.update({
         id: id,
         email: email,
+        password: password,
         full_name: full_name,
         roll: roll,
         phone_number: phone_number,
@@ -89,8 +120,13 @@ app.post('/accounts_update', (req, res) => {
         .then((row) => res.json({ 'kq': 1, 'row': row[0] }))
         .catch(err => res.json({ 'kq': 0 }))
 })
-
 // get list students
+app.get('/students_read', (req, res) => {
+    students.findAll()
+        .then((students) => res.json({ 'kq': 1, 'students': students }))
+        .catch(err => res.json({ 'kq': 0 }))
+})
+// add students
 app.post('/students_add', (req, res) => {
     let email = req.body.email
     let full_name = req.body.full_name
@@ -106,10 +142,10 @@ app.post('/students_add', (req, res) => {
         full_name: full_name,
         phone_number: phone_number,
         address: address,
-        attended: attended,
+        attended: false,
         createBy: createBy,
         updateBy: updateBy,
-        is_delete: is_delete,
+        is_delete: false,
     }).then(() => res.json({ 'kq': 1 }))
         .catch(err => res.json({ 'kq': 0 }))
 })
@@ -142,7 +178,7 @@ app.post('/students_update', (req, res) => {
         .catch(err => res.json({ 'kq': 0 }))
 })
 // delete students
-app.post('/students_update', (req, res) => {
+app.post('/students_delete', (req, res) => {
     const {
         id,
         email,
