@@ -19,10 +19,6 @@ const db = new sequelize({
 //     .then(() => console.log('>>>>>> ket noi thanh cong'))
 //     .catch(err => console.log(err.message))
 
-
-
-
-
 const accounts = db.define('accounts', { // model : table in database
     email: sequelize.STRING,
     password: sequelize.STRING,

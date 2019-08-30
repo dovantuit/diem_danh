@@ -158,7 +158,7 @@ app.post('/students_add', (req, res) => {
 
 
 
-        // gửi mail
+    // gửi mail
     transporter.verify(function (error, success) {
         // Nếu có lỗi.
         if (error) {
@@ -187,7 +187,7 @@ app.post('/students_add', (req, res) => {
                     </script>
                 </head>
                 <body>
-                    <p>Xin chào <b>${full_name.toUpperCase()}</b>. Đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
+                    <p>Xin chào <b>${full_name.toUpperCase()}</b>. Chúc mừng bạn đã đăng kí tham dự hội thảo ABC thành công, đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
                     <div style="border: 2px solid black;">
                     <h4 style=" text-align:center">VÉ MỜI</h4>
                     <img style=" margin-left: 85px;"
@@ -213,6 +213,82 @@ app.post('/students_add', (req, res) => {
                     console.log('>>> error')
                 } else {
                     console.log('>>> gửi mail thành công')
+                }
+            });
+        }
+    });
+
+
+    //
+})
+// gửi mail hàng loạt
+app.post('/students_mail', (req, res) => {
+    const { id,
+        email,
+        full_name,
+        phone_number,
+        updateBy,
+    } = req.body
+    students.update({
+        email: email,
+        full_name: full_name,
+        phone_number: phone_number,
+        updateBy: updateBy,
+    }, {
+            where: { id: id }
+        })
+        .then((row) => res.json({ 'kq': 1, 'row': row[0] }))
+        .catch(err => res.json({ 'kq': 0 }))
+
+        
+    // gửi mail
+    transporter.verify(function (error, success) {
+        // Nếu có lỗi.
+        if (error) {
+            console.log(error);
+        } else { //Nếu thành công.
+            // console.log(`>>>>> Kết nối thành công tới ${email}`);
+
+            transporter.sendMail({
+                from: 'homelesshacker2060@gmail.com',
+                to: email,
+                subject: `UNIT GỬI VÉ MỜI QR CODE CHO BẠN`,
+                html: `
+                <html>
+                <head>
+                    <title>Testing QR code</title>
+                    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+                    <script type="text/javascript">
+                        function generateBarCode()
+                        {
+                            var nric = $('#text').val();
+                            var url = 'https://api.qrserver.com/v1/create-qr-code/?data=' + nric + '&amp;size=50x50';
+                            $('#barcode').attr('src', url);
+                        }
+                    </script>
+                </head>
+                <body>
+                    <p>Xin chào <b>${full_name.toUpperCase()}</b>. Chúc mừng bạn đã đăng kí tham dự hội thảo ABC thành công, đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
+                    <div style="border: 2px solid black;">
+                    <h4 style=" text-align:center">VÉ MỜI</h4>
+                    <img style=" margin-left: 85px;"
+                        id='barcode' 
+                        src=https://api.qrserver.com/v1/create-qr-code/?data=${email}${phone_number}&amp;size=300x300" 
+                        alt="QR code" 
+                        title="QR code" 
+                        width="150" 
+                        height="150" 
+                    />
+                        <h4 style="text-align:center">SCAN NOW</h4>
+                        </div>
+
+                </body>
+                </html>`,
+            }, (error, info) => {
+                if (error) {
+                    console.log('>>> error')
+                } else {
+                    console.log(`>>> đã gửi mail cho học sinh ${email}`)
                 }
             });
         }

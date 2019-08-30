@@ -41,7 +41,5 @@ const transporter = nodemailer.createTransport({ // Use an app specific password
 //     }
 // });
 
-
-
 module.exports = { transporter }
 
