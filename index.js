@@ -3,51 +3,31 @@ var express = require("express");
 var app = express();
 const bodyParser = require('body-parser');
 const { accounts, students } = require('./db.js')
-const { transporter, options } = require('./main')
-transporter.verify(function (error, success) {
-    // Nếu có lỗi.
-    if (error) {
-        console.log(error);
-    } else { //Nếu thành công.
-        console.log('Kết nối thành công!');
+const { transporter, options } = require('./main') // để gửi mail
 
-        transporter.sendMail(options, (error, info) => {
-            if (error) {
-                console.log('error')
-            } else {
-                console.log('success')
-            }
-        });
-    }
-});
-// app.use(express.static("public"));
-// app.set("view engine", "ejs");
-// app.set("views","./views")
 
 var server = require("http").Server(app);
-server.listen(3000, () => console.log('server chay port 3000'));
+server.listen(3000, () => console.log('>>> server chay port 3000'));
 app.use(require("body-parser").json())
 app.use(bodyParser.urlencoded({ extended: true }))
 // app.get("/",function(req,res){
 //     res.render("trangchu");
 // });
 app.get("/", (req, res) => res.send('xin chao'));
+'use strict';
+const nodemailer = require('nodemailer');
+const path = require('path');
+const ABSPATH = path.dirname(process.mainModule.filename); // Absolute path to our app directory
+
 // get list accounts
 app.get('/accounts_read', (req, res) => {
-
-    // gửi mail
-
-
-
-
-    //
-
     accounts.findAll()
         .then((accounts) => res.json({ 'kq': 1, 'accounts': accounts }))
         .catch(err => res.json({ 'kq': 0 }))
 })
 // add accounts
 app.post('/accounts_add', (req, res) => {
+
     let email = req.body.email
     let password = req.body.password
     let full_name = req.body.full_name
@@ -65,6 +45,70 @@ app.post('/accounts_add', (req, res) => {
         is_active: true,
     }).then(() => res.json({ 'kq': 1 }))
         .catch(err => res.json({ 'kq': 0 }))
+
+
+    // gửi mail
+    transporter.verify(function (error, success) {
+        // Nếu có lỗi.
+        if (error) {
+            console.log(error);
+        } else { //Nếu thành công.
+            // console.log(`>>>>> Kết nối thành công tới ${email}`);
+
+            transporter.sendMail({
+                from: 'homelesshacker2060@gmail.com',
+                to: email,
+                subject: `UNIT GỬI VÉ MỜI QR CODE CHO BẠN`,
+                // text: `Xin chào ${full_name.toUpperCase()}   Đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn ${code}`,
+                // html: `Xin chào <h1>${full_name.toUpperCase()}</h1><img src="https://i.imgur.com/HTxyz4T.png" alt="Smiley face" height="42" width="42"><p>Đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn</b><ul><li>Username:` + `tom` + `</li><li>Email:` + email + `</li><li>Username:` + phone_number + `</li></ul>`,
+                html: `
+                <html>
+                <head>
+                    <title>Testing QR code</title>
+                    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+                    <script type="text/javascript">
+                        function generateBarCode()
+                        {
+                            var nric = $('#text').val();
+                            var url = 'https://api.qrserver.com/v1/create-qr-code/?data=' + nric + '&amp;size=50x50';
+                            $('#barcode').attr('src', url);
+                        }
+                    </script>
+                </head>
+                <body>
+                    <p>Xin chào <b>${full_name.toUpperCase()}</b>. Đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
+                    <div style="border: 2px solid black;">
+                    <h4 style=" text-align:center">VÉ MỜI</h4>
+                    <img style=" margin-left: 85px;"
+                        id='barcode' 
+                        src=https://api.qrserver.com/v1/create-qr-code/?data=${email}${phone_number}&amp;size=300x300" 
+                        alt="QR code" 
+                        title="QR code" 
+                        width="150" 
+                        height="150" 
+                    />
+                        <h4 style="text-align:center">SCAN NOW</h4>
+                        </div>
+
+                </body>
+                </html>`,
+                // attachments: [
+                //     {
+                //         path: ABSPATH + '/logo.png'
+                //     }
+                // ]
+            }, (error, info) => {
+                if (error) {
+                    console.log('>>> error')
+                } else {
+                    console.log('>>> gửi mail thành công')
+                }
+            });
+        }
+    });
+
+
+    //
 })
 // update accounts
 app.post('/accounts_update', (req, res) => {
