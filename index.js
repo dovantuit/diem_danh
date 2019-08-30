@@ -240,7 +240,7 @@ app.post('/students_mail', (req, res) => {
         .then((row) => res.json({ 'kq': 1, 'row': row[0] }))
         .catch(err => res.json({ 'kq': 0 }))
 
-        
+
     // gửi mail
     transporter.verify(function (error, success) {
         // Nếu có lỗi.
@@ -268,7 +268,7 @@ app.post('/students_mail', (req, res) => {
                     </script>
                 </head>
                 <body>
-                    <p>Xin chào <b>${full_name.toUpperCase()}</b>. Chúc mừng bạn đã đăng kí tham dự hội thảo ABC thành công, đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
+                    <p>Xin chào <b>${full_name}</b>. Chúc mừng bạn đã đăng kí tham dự hội thảo ABC thành công, đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
                     <div style="border: 2px solid black;">
                     <h4 style=" text-align:center">VÉ MỜI</h4>
                     <img style=" margin-left: 85px;"
