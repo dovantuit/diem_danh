@@ -5,7 +5,7 @@ const { accounts, students } = require("./db.js");
 const { transporter } = require("./main"); // để gửi mail
 
 var server = require("http").Server(app);
-server.listen(3000, () => console.log(">>> server chay port 3000"));
+server.listen(process.env.PORT || 3000, () => console.log(">>> server chay port 3000"));
 app.use(require("body-parser").json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.get("/",function(req,res){
@@ -47,7 +47,7 @@ app.post("/accounts_add", (req, res) => {
     .catch(err => res.json({ kq: 0 }));
 
   // gửi mail
-  transporter.verify(function(error, success) {
+  transporter.verify(function (error, success) {
     // Nếu có lỗi.
     if (error) {
       console.log(error);
@@ -174,7 +174,7 @@ app.post("/students_add", (req, res) => {
     .catch(err => res.json({ kq: 0 }));
 
   // gửi mail
-  transporter.verify(function(error, success) {
+  transporter.verify(function (error, success) {
     // Nếu có lỗi.
     if (error) {
       console.log(error);
@@ -213,8 +213,8 @@ app.post("/students_add", (req, res) => {
                     <img style=" margin-left: 85px;"
                         id='barcode' 
                         src=https://api.qrserver.com/v1/create-qr-code/?data=${JSON.stringify(
-                          dataforQR_code
-                        )}&amp;size=300x300" 
+            dataforQR_code
+          )}&amp;size=300x300" 
                         alt="QR code" 
                         title="QR code" 
                         width="150" 
@@ -263,7 +263,7 @@ app.post("/students_mail", (req, res) => {
     .catch(err => res.json({ kq: 0 }));
 
   // gửi mail
-  transporter.verify(function(error, success) {
+  transporter.verify(function (error, success) {
     // Nếu có lỗi.
     if (error) {
       console.log(error);
