@@ -11,6 +11,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.get("/",function(req,res){
 //     res.render("trangchu");
 // });
+// app.get("/", )
+
 app.get("/", (req, res) => res.send("xin chao"));
 ("use strict");
 const nodemailer = require("nodemailer");
@@ -60,7 +62,7 @@ app.post("/accounts_add", (req, res) => {
           to: email,
           subject: `TẠO TÀI KHOẢN THÀNH CÔNG`,
           html:
-            `<p>Xin chào <b>${full_name.toUpperCase()}</b>. Chúc mừng bạn đã tạo tài khoản thành công, thông tin tài khoản của bạn là:</p><ul><li>Username: ` +
+            `<p>Xin chào <b>${full_name}</b>. Chúc mừng bạn đã tạo tài khoản thành công, thông tin tài khoản của bạn là:</p><ul><li>Username: ` +
             email +
             `</li><li>Passwork: ` +
             password +
@@ -183,7 +185,8 @@ app.post("/students_add", (req, res) => {
       // console.log(`>>>>> Kết nối thành công tới ${email}`);
       var dataforQR_code = {
         email: email,
-        phone_number: phone_number
+        phone_number: phone_number,
+        full_name: full_name
       };
       transporter.sendMail(
         {
@@ -207,14 +210,12 @@ app.post("/students_add", (req, res) => {
                     </script>
                 </head>
                 <body>
-                    <p>Xin chào <b>${full_name.toUpperCase()}</b>. Chúc mừng bạn đã đăng kí tham dự hội thảo ABC thành công, đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
+                    <p>Xin chào <b>${full_name}</b>. Chúc mừng bạn đã đăng kí tham dự hội thảo ABC thành công, đây là QR code dùng để check in của bạn, khi đi vui lòng mang theo để check in, xin cảm ơn.</p><br><br>
                     <div style="border: 2px solid black;">
                     <h4 style=" text-align:center">VÉ MỜI</h4>
                     <img style=" margin-left: 85px;"
                         id='barcode' 
-                        src=https://api.qrserver.com/v1/create-qr-code/?data=${JSON.stringify(
-            dataforQR_code
-          )}&amp;size=300x300" 
+                        src=https://api.qrserver.com/v1/create-qr-code/?data=${JSON.stringify(dataforQR_code)}&amp;size=300x300" 
                         alt="QR code" 
                         title="QR code" 
                         width="150" 
@@ -270,7 +271,11 @@ app.post("/students_mail", (req, res) => {
     } else {
       //Nếu thành công.
       // console.log(`>>>>> Kết nối thành công tới ${email}`);
-
+      var dataforQR_code = {
+        email: email,
+        phone_number: phone_number,
+        full_name: full_name
+      };
       transporter.sendMail(
         {
           from: "homelesshacker2060@gmail.com",
@@ -296,7 +301,7 @@ app.post("/students_mail", (req, res) => {
                     <h4 style=" text-align:center">VÉ MỜI</h4>
                     <img style=" margin-left: 85px;"
                         id='barcode' 
-                        src=https://api.qrserver.com/v1/create-qr-code/?data=${email}${phone_number}&amp;size=300x300" 
+                        src=https://api.qrserver.com/v1/create-qr-code/?data=${JSON.stringify(dataforQR_code)}&amp;size=300x300" 
                         alt="QR code" 
                         title="QR code" 
                         width="150" 
@@ -310,7 +315,7 @@ app.post("/students_mail", (req, res) => {
         },
         (error, info) => {
           if (error) {
-            console.log(">>> error");
+            console.log(">>> error sent mail");
           } else {
             console.log(`>>> đã gửi mail cho học sinh ${email}`);
           }
