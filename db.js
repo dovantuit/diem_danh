@@ -48,7 +48,8 @@ const students = db.define('students', { // model : table in database
     attended: sequelize.BOOLEAN,
     createBy: sequelize.STRING,
     updateBy: sequelize.STRING,
-    is_delete: sequelize.BOOLEAN
+    is_delete: sequelize.BOOLEAN,
+    is_sentMail: sequelize.BOOLEAN
 })
 // students.create({
 //     email: 'dovantuit@gmail.com',
@@ -58,7 +59,8 @@ const students = db.define('students', { // model : table in database
 //     attended: false,
 //     createBy: 'do van tu',
 //     updateBy: 'do van tu',
-//     is_delete: false
+//     is_delete: false,
+//     is_sentMail: false
 // }).then(students => console.log(students.get({ plain: true })))
 //     .catch(err => console.log(err.message))
 

@@ -170,7 +170,7 @@ app.post("/students_add", (req, res) => {
       attended: false,
       createBy: createBy,
       updateBy: updateBy,
-      is_delete: false
+      is_delete: false,
     })
     .then(() => res.json({ kq: 1 }))
     .catch(err => res.json({ kq: 0 }));
@@ -227,9 +227,9 @@ app.post("/students_add", (req, res) => {
                 </body>
                 </html>`
           // attachments: [
-          //     {
-          //         path: ABSPATH + '/logo.png'
-          //     }
+          //   {
+          //     path: ABSPATH + '/test-data.csv'
+          //   }
           // ]
         },
         (error, info) => {
@@ -485,4 +485,78 @@ app.get("/gg_read", (req, res) => {
       .then(rows => res.json({ kq: 1, rows: rows.data }))
       .catch(err => res.json({ kq: 0 }));
   }
+});
+// gửi mail báo cáo
+
+
+
+app.post("/report_mail", (req, res) => {
+
+
+  const { email, data } = req.body;
+  // tao file excel
+  const csvjson = require('csvjson');
+  const readFile = require('fs').readFile;
+  const writeFile = require('fs').writeFile;
+  //// xử lí load dữ liệu từ postgresSQL
+  // var data_from_postgres = []
+  students
+    .findAll()
+    .then(students => res.json({ kq: 1, data_from_postgres: students }))
+    // .then(students => console.log(students))
+    .catch(err => res.json({ kq: 0 }));
+  // console.log(JSON.stringify(data_from_postgres))
+
+
+
+
+  //
+
+  // readFile(`./test_data.json`, 'utf-8', (err, fileContent) => {
+  //   if (err) {
+  //     console.log(err); // Do something to handle the error or just throw it
+  //     throw new Error(err);
+  //   }
+  const csvData = csvjson.toCSV(data, {
+    headers: 'key'
+  });
+  writeFile(`./${email}.csv`, csvData, (err) => {
+    if (err) {
+      console.log(err); // Do something to handle the error or just throw it
+      throw new Error(err);
+    }
+    console.log('Success!');
+  });
+  // });
+
+  // gửi mail
+  transporter.verify(function (error, success) {
+    // Nếu có lỗi.
+    if (error) {
+      console.log(error);
+    } else {
+      transporter.sendMail(
+        {
+          from: "homelesshacker2060@gmail.com",
+          to: email,
+          subject: `UNIT GỬI BÁO CÁO EXCEL CHO BẠN`,
+          text: 'Đây là file báo cáo EXCEL',
+          attachments: [
+            {
+              path: ABSPATH + `/${email}.csv`
+            }
+          ]
+        },
+        (error, info) => {
+          if (error) {
+            console.log(">>> error sent mail");
+            res.json({ kq: 0 })
+          } else {
+            console.log(`>>> đã gửi BÁO CÁO đến ${email}`);
+            res.json({ kq: 1 })
+          }
+        }
+      )
+    }
+  });
 });
