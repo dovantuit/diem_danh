@@ -1,7 +1,7 @@
 var express = require("express");
 const bodyParser = require("body-parser");
 var app = express();
-const { accounts, students } = require("./db.js"); // connect database
+const { accounts } = require("./db.js"); // connect database
 const { transporter } = require("./main"); //  email setting
 
 var server = require("http").Server(app);
