@@ -16,7 +16,7 @@ const db = new sequelize({
 })
 
 db.authenticate()
-    .then(() => console.log('>>> ket noi thanh cong'))
+    .then(() => console.log('>>> ket noi DB thanh cong'))
     .catch(err => console.log(err.message))
 
 const accounts = db.define('accounts', { // model : table in database

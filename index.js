@@ -1,11 +1,11 @@
 var express = require("express");
-var app = express();
 const bodyParser = require("body-parser");
+var app = express();
 const { accounts, students } = require("./db.js"); // connect database
 const { transporter } = require("./main"); //  email setting
 
 var server = require("http").Server(app);
-server.listen(process.env.PORT || 3000, () => console.log(">>> server run port 3000"));
+server.listen(process.env.PORT || 3000, () => console.log(">>> server run port 3000")); 
 app.use(require("body-parser").json()); // allow input json type
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -19,87 +19,57 @@ const ABSPATH = path.dirname(process.mainModule.filename); // Absolute path to o
 app.get("/accounts_read", (req, res) => {
   accounts
     .findAll()
-    .then(accounts => res.json({ kq: 1, accounts: accounts }))
-    .catch(err => res.json({ kq: 0 }));
+    .then(accounts => res.json({ status: 200, accounts: accounts }))
+    .catch(err => res.json({ status: 202 }));
 });
 
 // add accounts
 app.post("/accounts_add", (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
-  let full_name = req.body.full_name;
-  let birthday = req.body.birthday;
   accounts
     .create({
-      email: email,
-      password: password,
-      full_name: full_name,
-      birthday: birthday
+      email: req.body.email,
+      password: req.body.password,
+      full_name: req.body.full_name,
+      birthday: req.body.birthday
     })
-    .then(() => res.json({ kq: 1 }))
-    .catch(err => res.json({ kq: 0 }));
+    .then(() => res.json({ status: 200 }))
+    .catch(err => res.json({ status: 202 }));
 });
+
 // update accounts
 app.post("/accounts_update", (req, res) => {
-  const {
-    id,
-    email,
-    password,
-    full_name,
-    roll,
-    phone_number,
-    address,
-    is_active
-  } = req.body;
   accounts
     .update(
       {
-        id: id,
-        email: email,
-        password: password,
-        full_name: full_name,
-        roll: roll,
-        phone_number: phone_number,
-        address: address,
-        is_active: is_active
+        id: req.body.id,
+        email: req.body.email,
+        password: req.body.password,
+        full_name: req.body.full_name,
+        birthday: req.body.birthday
       },
       {
-        where: { id: id }
+        where: { id: req.body.id }
       }
     )
-    .then(row => res.json({ kq: 1, row: row[0] }))
-    .catch(err => res.json({ kq: 0 }));
+    .then(row => res.json({ status: 200, row: row[0] }))
+    .catch(err => res.json({ status: 202 }));
 });
+
 // delete accounts
-app.post("/accounts_update", (req, res) => {
-  const {
-    id,
-    email,
-    password,
-    full_name,
-    roll,
-    phone_number,
-    address
-    // is_active
-  } = req.body;
+app.delete('/accounts_delete', function (req, res) {
   accounts
-    .update(
-      {
-        id: id,
-        email: email,
-        password: password,
-        full_name: full_name,
-        roll: roll,
-        phone_number: phone_number,
-        address: address,
-        is_active: false
-      },
-      {
-        where: { id: id }
+    
+    .destroy({
+      where: { id: req.params.id }
+    })
+    .then(function (rowDeleted) { // rowDeleted will return number of rows deleted
+      if (rowDeleted === 1) {
+        return res.status(200);
       }
-    )
-    .then(row => res.json({ kq: 1, row: row[0] }))
-    .catch(err => res.json({ kq: 0 }));
+    }, function (err) {
+      return res.status(202);
+    });
+
 });
 
 // test gg api
@@ -191,7 +161,7 @@ app.get("/gg_read", (req, res) => {
         spreadsheetId: "1k87iTq0Z8A8cS8XE9ArgvC1vrORAc9cYK8dQdAUz9Ko",
         range: "A2:E100"
       })
-      .then(rows => res.json({ kq: 1, rows: rows.data }))
-      .catch(err => res.json({ kq: 0 }));
+      .then(rows => res.json({ status: 200, rows: rows.data }))
+      .catch(err => res.json({ status: 202 }));
   }
 });
